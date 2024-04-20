@@ -19,6 +19,8 @@ const byte addButton = 13;
 const byte rightButton = 8;
 const byte leftButton = 9;
 
+int dice = 0;
+
 void setup() {
   Serial.begin(9600);
 
@@ -31,6 +33,8 @@ void setup() {
   pinMode(rightButton, INPUT_PULLUP);
   pinMode(leftButton, INPUT_PULLUP);
 
+  randomSeed(analogRead(A0));
+
   //Set upt the number of columns and rows of the LCD
   lcd.begin(16,2);
   //Print the welcome text to the screen
@@ -42,16 +46,19 @@ void loop() {
   //Poll the buttons
   if (digitalRead(selectButton) == LOW){
     delay(300); //Small delay to debounce the button
-    clearRow(1);
-    lcd.setCursor(0, 1);
-    lcd.print("Select");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("You rolled");
+    lcd.setCursor(0,1);
+    lcd.print(rollDice());
     Serial.println("Select");
   }
   if (digitalRead(backButton) == LOW){
     delay(300);
-    clearRow(1);
-    lcd.setCursor(0, 1);
-    lcd.print("Back");
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    startText();
+    dice = 0;
     Serial.println("Back");
   }
   if (digitalRead(removeButton) == LOW){
@@ -70,17 +77,19 @@ void loop() {
   }
   if (digitalRead(rightButton) == LOW){
     delay(300);
+    dice += 1;
     clearRow(1);
     lcd.setCursor(0, 1);
-    lcd.print("Right");
-    Serial.println("Right");
+    lcd.print(dice);
+    Serial.println(dice);
   }
   if (digitalRead(leftButton) == LOW){
     delay(300);
+    dice -= 1;
     clearRow(1);
     lcd.setCursor(0, 1);
-    lcd.print("Left");
-    Serial.println("Left");
+    lcd.print(dice);
+    Serial.println(dice);
   }
 }
 
@@ -94,5 +103,12 @@ void clearRow(int row) {
 }
 
 void startText() {
-  lcd.print("Choose the dice");
+  lcd.print("Choose the die");
+}
+
+int rollDice() {
+  int randomNumber = random(1,dice);
+  Serial.print("Random number is ");
+  Serial.println(randomNumber);
+  return randomNumber;
 }
